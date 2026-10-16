@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Checkout — Rory Footwear</title>
+  <meta name="description" content="Secure checkout.">
+  <meta name="theme-color" content="#fef9f5">
+  <meta property="og:title" content="Rory Footwear — Footwear for the whole family">
+  <meta property="og:description" content="Slides, sandals and wedges. Pay on delivery in Lagos.">
+  <meta property="og:image" content="assets/img/products/lekki-toeloop.jpg">
+  <link rel="icon" href="assets/img/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================
+       DESIGN TOKENS
+       ============================================ */
+    :root {
+      --bg: #fef9f5;
+      --bg-alt: #fff5ee;
+      --surface: #ffffff;
+      --surface-hover: #fffaf7;
+      --ink: #1a1614;
+      --ink-soft: #6b5f58;
+      --ink-muted: #a8988e;
+      --rule: #f0e6de;
+      --rule-strong: #e8ddd4;
+
+      --peach: #ffb59b;
+      --peach-soft: #ffe8df;
+      --peach-deep: #ff8f6b;
+      --coral: #ff7a5c;
+      --coral-soft: #ffe3da;
+      --lavender: #c9b6ff;
+      --lavender-soft: #ede6ff;
+      --mint: #a8e6d0;
+      --mint-soft: #e0f7f0;
+      --butter: #ffe9a8;
+      --butter-soft: #fff8e0;
+
+      --accent: var(--coral);
+      --accent-hover: #ff6344;
+      --success: #0d9b6c;
+
+      --font-display: 'Plus Jakarta Sans', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --font-mono: 'Space Grotesk', monospace;
+
+      --radius-sm: 0.75rem;
+      --radius: 1.25rem;
+      --radius-lg: 1.75rem;
+      --radius-full: 999px;
+
+      --shadow-sm: 0 2px 8px rgba(26, 22, 20, 0.04);
+      --shadow: 0 8px 24px rgba(26, 22, 20, 0.06);
+      --shadow-lg: 0 16px 48px rgba(26, 22, 20, 0.08);
+      --shadow-glow: 0 8px 32px rgba(255, 122, 92, 0.2);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    img { display: block; max-width: 100%; height: auto; }
+    a { color: inherit; text-decoration: none; }
+    button, input, select, textarea { font: inherit; color: inherit; border: none; background: none; }
+    button { cursor: pointer; }
+    ul { list-style: none; }
+
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* ============================================
+       TYPOGRAPHY
+       ============================================ */
+    .display {
+      font-family: var(--font-display);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+    }
+    .h2 { font-size: clamp(1.75rem, 4vw, 2.5rem); }
+    .h3 { font-size: clamp(1.25rem, 2.5vw, 1.5rem); }
+
+    .lead {
+      font-size: clamp(1rem, 1.3vw, 1.15rem);
+      color: var(--ink-soft);
+      line-height: 1.7;
+      max-width: 55ch;
+    }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .eyebrow::before {
+      content: '';
+      width: 1.5rem;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 1px;
+    }
+
+    em {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    /* ============================================
+       HEADER
+       ============================================ */
+    .checkout-header {
+      background: rgba(254, 249, 245, 0.85);
+      backdrop-filter: blur(20px) saturate(1.8);
+      -webkit-backdrop-filter: blur(20px) saturate(1.8);
+      border-bottom: 1px solid var(--rule);
+      padding: 1.25rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .checkout-header .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.35rem;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+    }
+
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--coral), var(--peach));
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 800;
+      box-shadow: var(--shadow-glow);
+    }
+
+    .secure {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--success);
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-full);
+      background: var(--mint-soft);
+    }
+    .secure svg { width: 16px; height: 16px; }
+
+    /* ============================================
+       BUTTONS
+       ============================================ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1.6rem;
+      border-radius: var(--radius-full);
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.9rem;
+      border: 1.5px solid transparent;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: pointer;
+      white-space: nowrap;
+      line-height: 1.2;
+    }
+    .btn svg { width: 1.1em; height: 1.1em; flex-shrink: 0; transition: transform 0.25s; }
+    .btn:hover svg { transform: translateX(3px); }
+
+    .btn-primary { background: var(--ink); color: #fff; box-shadow: var(--shadow-sm); }
+    .btn-primary:hover { background: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow-glow); }
+
+    .btn-accent { background: var(--coral); color: #fff; box-shadow: var(--shadow-glow); }
+    .btn-accent:hover { background: var(--accent-hover); transform: translateY(-2px) scale(1.02); }
+
+    .btn-outline { background: transparent; color: var(--ink); border-color: var(--rule-strong); }
+    .btn-outline:hover { background: var(--ink); color: #fff; border-color: var(--ink); transform: translateY(-2px); }
+
+    .btn-lg { padding: 1rem 2rem; font-size: 1rem; }
+    .btn-block { width: 100%; }
+
+    /* ============================================
+       CHECKOUT LAYOUT
+       ============================================ */
+    .checkout-wrap {
+      padding: 3rem 0 4rem;
+    }
+
+    .checkout-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: clamp(2rem, 4vw, 3.5rem);
+      align-items: start;
+    }
+
+    /* ============================================
+       FORM SECTIONS
+       ============================================ */
+    .checkout-main {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .form-section {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--rule);
+      padding: clamp(1.5rem, 3vw, 2rem);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .form-section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .step-number {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--ink);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .step-number.done {
+      background: var(--success);
+    }
+
+    .form-section-header h2 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+    }
+
+    .form-section-header .step-edit {
+      margin-left: auto;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent);
+      font-family: var(--font-display);
+      transition: opacity 0.2s;
+      display: none;
+    }
+    .form-section-header .step-edit:hover { opacity: 0.7; }
+    .form-section.completed .step-edit { display: inline; }
+
+    /* ============================================
+       FORM FIELDS
+       ============================================ */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .form-row.full { grid-template-columns: 1fr; }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .form-field label {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.8rem;
+      letter-spacing: 0.02em;
+      color: var(--ink);
+    }
+
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--rule-strong);
+      background: var(--surface);
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      color: var(--ink);
+    }
+
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(255, 122, 92, 0.12);
+      background: #fff;
+    }
+
+    .form-field input::placeholder,
+    .form-field textarea::placeholder {
+      color: var(--ink-muted);
+    }
+
+    .form-field input.error,
+    .form-field select.error {
+      border-color: #ff5c5c;
+      box-shadow: 0 0 0 4px rgba(255, 92, 92, 0.1);
+    }
+
+    .form-field .error-msg {
+      font-size: 0.75rem;
+      color: #ff5c5c;
+      font-weight: 500;
+      display: none;
+    }
+    .form-field.has-error .error-msg { display: block; }
+
+    /* ============================================
+       DELIVERY OPTIONS
+       ============================================ */
+    .delivery-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .delivery-option {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      border-radius: var(--radius);
+      border: 1.5px solid var(--rule-strong);
+      background: var(--surface);
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .delivery-option:hover {
+      border-color: var(--peach);
+      background: var(--surface-hover);
+    }
+
+    .delivery-option.selected {
+      border-color: var(--coral);
+      background: var(--coral-soft);
+      box-shadow: 0 0 0 4px rgba(255, 122, 92, 0.08);
+    }
+
+    .delivery-option input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .delivery-radio {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--rule-strong);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .delivery-option.selected .delivery-radio {
+      border-color: var(--coral);
+      background: var(--coral);
+    }
+    .delivery-radio::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #fff;
+      transform: scale(0);
+      transition: transform 0.2s;
+    }
+    .delivery-option.selected .delivery-radio::after { transform: scale(1); }
+
+    .delivery-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+      flex: 1;
+    }
+    .delivery-info .name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--ink);
+    }
+    .delivery-info .desc {
+      font-size: 0.8rem;
+      color: var(--ink-soft);
+    }
+
+    .delivery-price {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+    .delivery-price.free { color: var(--success); }
+
+    /* ============================================
+       PAYMENT OPTIONS
+       ============================================ */
+    .payment-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .payment-option {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      border-radius: var(--radius);
+      border: 1.5px solid var(--rule-strong);
+      background: var(--surface);
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .payment-option:hover {
+      border-color: var(--peach);
+      background: var(--surface-hover);
+    }
+
+    .payment-option.selected {
+      border-color: var(--coral);
+      background: var(--coral-soft);
+      box-shadow: 0 0 0 4px rgba(255, 122, 92, 0.08);
+    }
+
+    .payment-option input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .payment-radio {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--rule-strong);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .payment-option.selected .payment-radio {
+      border-color: var(--coral);
+      background: var(--coral);
+    }
+    .payment-radio::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #fff;
+      transform: scale(0);
+      transition: transform 0.2s;
+    }
+    .payment-option.selected .payment-radio::after { transform: scale(1); }
+
+    .payment-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-alt);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      color: var(--ink-soft);
+    }
+    .payment-icon svg { width: 22px; height: 22px; }
+
+    .payment-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+      flex: 1;
+    }
+    .payment-info .name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--ink);
+    }
+    .payment-info .desc {
+      font-size: 0.8rem;
+      color: var(--ink-soft);
+    }
+
+    .payment-tag {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 0.2rem 0.6rem;
+      border-radius: var(--radius-full);
+      background: var(--mint-soft);
+      color: var(--success);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ============================================
+       ORDER SUMMARY
+       ============================================ */
+    .order-summary {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--rule);
+      padding: clamp(1.5rem, 3vw, 2rem);
+      box-shadow: var(--shadow-sm);
+      position: sticky;
+      top: 100px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .order-summary h2 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .order-items {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-height: 320px;
+      overflow-y: auto;
+      padding-right: 0.25rem;
+    }
+
+    .order-item {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .order-item-thumb {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      background: var(--peach-soft);
+      flex-shrink: 0;
+      position: relative;
+    }
+    .order-item-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+    .order-item-qty {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--ink);
+      color: #fff;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.65rem;
+      display: grid;
+      place-items: center;
+      border: 2px solid var(--surface);
+    }
+
+    .order-item-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+    .order-item-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--ink);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .order-item-meta {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--ink-muted);
+    }
+
+    .order-item-price {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    .promo-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .promo-row input {
+      flex: 1;
+      padding: 0.7rem 1rem;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--rule-strong);
+      background: var(--surface);
+      font-size: 0.85rem;
+      transition: border-color 0.2s;
+    }
+    .promo-row input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .promo-row button {
+      padding: 0.7rem 1.2rem;
+      border-radius: var(--radius-sm);
+      background: var(--ink);
+      color: #fff;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+    .promo-row button:hover { background: var(--accent); }
+
+    .order-totals {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--rule);
+    }
+
+    .order-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+      color: var(--ink-soft);
+    }
+    .order-total-row span:last-child {
+      font-family: var(--font-display);
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .order-total-row.discount span:last-child { color: var(--success); }
+
+    .order-total-row.grand {
+      padding-top: 1rem;
+      border-top: 1.5px solid var(--rule);
+      font-size: 1.1rem;
+      color: var(--ink);
+    }
+    .order-total-row.grand span:last-child {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.35rem;
+      letter-spacing: -0.02em;
+    }
+
+    .order-cta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .order-trust {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--rule);
+    }
+    .order-trust-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--ink-soft);
+    }
+    .order-trust-item svg {
+      width: 16px;
+      height: 16px;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ============================================
+       SUCCESS STATE
+       ============================================ */
+    .checkout-success {
+      text-align: center;
+      padding: 4rem 1rem;
+      max-width: 520px;
+      margin: 0 auto;
+      display: none;
+    }
+    .checkout-success.visible { display: block; }
+
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--mint-soft);
+      display: grid;
+      place-items: center;
+      margin: 0 auto 1.5rem;
+      color: var(--success);
+      animation: pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .success-icon svg { width: 40px; height: 40px; }
+
+    @keyframes pop {
+      0% { transform: scale(0); }
+      100% { transform: scale(1); }
+    }
+
+    .checkout-success h2 {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.75rem;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+    }
+    .checkout-success p {
+      color: var(--ink-soft);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+    .success-order-id {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-full);
+      background: var(--bg-alt);
+      display: inline-block;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
+    @media (max-width: 900px) {
+      .checkout-grid { grid-template-columns: 1fr; }
+      .order-summary { position: static; }
+    }
+
+    @media (max-width: 600px) {
+      .form-row { grid-template-columns: 1fr; }
+      .checkout-wrap { padding: 1.5rem 0 3rem; }
+      .checkout-header .container { flex-wrap: wrap; }
+      .secure { font-size: 0.7rem; padding: 0.4rem 0.8rem; }
+      .delivery-option, .payment-option { padding: 0.85rem 1rem; }
+      .order-item-thumb { width: 52px; height: 52px; }
+    }
+  </style>
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <script src="https://js.paystack.co/v1/inline.js" defer></script>
+  <script src="assets/js/data.js" defer></script>
+  <script src="assets/js/pages.js" defer></script>
+  <script src="assets/js/app.js" defer></script>
+</head>
+<body data-page="checkout">
+
+  <!-- ============================================
+       HEADER
+       ============================================ -->
+  <header class="checkout-header">
+    <div class="container">
+      <a href="index.html" class="logo nav-brand" aria-label="Rory Footwear home"><img class="nav-brand-logo" src="assets/img/logo-160.png" alt="" width="44" height="44"><span class="nav-brand-text">Rory Footwear<small>Step up your style</small></span></a>
+      <span class="secure">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>
+        Secure checkout
+      </span>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============================================
+         CHECKOUT FORM
+         ============================================ -->
+    <div class="checkout-wrap" id="checkoutWrap">
+      <div class="container">
+        <div style="margin-bottom: 2rem;">
+          <p class="eyebrow">Almost there</p>
+          <h1 class="display h2">Complete your <em>order</em></h1>
+        </div>
+
+        <div class="checkout-grid">
+          <!-- MAIN FORM -->
+          <div class="checkout-main">
+            <!-- Step 1: Contact -->
+            <section class="form-section" id="step-contact">
+              <div class="form-section-header">
+                <span class="step-number">1</span>
+                <h2>Contact information</h2>
+                <a href="#" class="step-edit" data-edit="contact">Edit</a>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="firstName">First name</label>
+                  <input type="text" id="firstName" placeholder="Adaeze" autocomplete="given-name" required>
+                  <span class="error-msg">Please enter your first name</span>
+                </div>
+                <div class="form-field">
+                  <label for="lastName">Last name</label>
+                  <input type="text" id="lastName" placeholder="Okafor" autocomplete="family-name" required>
+                  <span class="error-msg">Please enter your last name</span>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="email">Email address</label>
+                  <input type="email" id="email" placeholder="you@example.com" autocomplete="email" required>
+                  <span class="error-msg">Please enter a valid email address</span>
+                </div>
+                <div class="form-field">
+                  <label for="phone">Phone number</label>
+                  <input type="tel" id="phone" placeholder="080 1234 5678" autocomplete="tel" required>
+                  <span class="error-msg">Please enter your phone number</span>
+                </div>
+              </div>
+            </section>
+
+            <!-- Step 2: Delivery -->
+            <section class="form-section" id="step-delivery">
+              <div class="form-section-header">
+                <span class="step-number">2</span>
+                <h2>Delivery address</h2>
+              </div>
+
+              <div class="form-row full">
+                <div class="form-field">
+                  <label for="address">Street address</label>
+                  <input type="text" id="address" placeholder="12 Admiralty Way" autocomplete="street-address" required>
+                  <span class="error-msg">Please enter your street address</span>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="city">City</label>
+                  <input type="text" id="city" placeholder="Lekki" autocomplete="address-level2" required>
+                  <span class="error-msg">Please enter your city</span>
+                </div>
+                <div class="form-field">
+                  <label for="state">State</label>
+                  <select id="state" autocomplete="address-level1" required>
+                    <option value="">Select state</option>
+                    <option value="Lagos">Lagos</option>
+                    <option value="Abuja">Abuja FCT</option>
+                    <option value="Rivers">Rivers</option>
+                    <option value="Oyo">Oyo</option>
+                    <option value="Kano">Kano</option>
+                    <option value="Enugu">Enugu</option>
+                    <option value="Kaduna">Kaduna</option>
+                    <option value="Ogun">Ogun</option>
+                  </select>
+                  <span class="error-msg">Please select a state</span>
+                </div>
+              </div>
+
+              <div style="margin-top: 1.5rem;">
+                <p style="font-family: var(--font-display); font-weight: 700; font-size: 0.85rem; margin-bottom: 0.75rem; color: var(--ink);">Delivery method</p>
+                <div class="delivery-options" id="deliveryOptions">
+                  <label class="delivery-option selected" data-delivery="lagos">
+                    <input type="radio" name="delivery" value="lagos" checked>
+                    <span class="delivery-radio"></span>
+                    <div class="delivery-info">
+                      <span class="name">Lagos same / next day</span>
+                      <span class="desc">Order before 2pm for same-day dispatch</span>
+                    </div>
+                    <span class="delivery-price">₦2,500</span>
+                  </label>
+                  <label class="delivery-option" data-delivery="nationwide">
+                    <input type="radio" name="delivery" value="nationwide">
+                    <span class="delivery-radio"></span>
+                    <div class="delivery-info">
+                      <span class="name">Nationwide delivery</span>
+                      <span class="desc">2–5 working days</span>
+                    </div>
+                    <span class="delivery-price">₦4,500</span>
+                  </label>
+                  <label class="delivery-option" data-delivery="pickup">
+                    <input type="radio" name="delivery" value="pickup">
+                    <span class="delivery-radio"></span>
+                    <div class="delivery-info">
+                      <span class="name">Pickup station</span>
+                      <span class="desc">Collect from our Lekki store</span>
+                    </div>
+                    <span class="delivery-price free">Free</span>
+                  </label>
+                </div>
+              </div>
+            </section>
+
+            <!-- Step 3: Payment -->
+            <section class="form-section" id="step-payment">
+              <div class="form-section-header">
+                <span class="step-number">3</span>
+                <h2>Payment method</h2>
+              </div>
+
+              <div class="payment-options" id="paymentOptions">
+                <label class="payment-option selected" data-payment="paystack">
+                  <input type="radio" name="payment" value="paystack" checked>
+                  <span class="payment-radio"></span>
+                  <span class="payment-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                  </span>
+                  <div class="payment-info">
+                    <span class="name">Card, transfer or USSD</span>
+                    <span class="desc">Secure payment via Paystack</span>
+                  </div>
+                  <span class="payment-tag">Recommended</span>
+                </label>
+
+                <label class="payment-option" data-payment="pod">
+                  <input type="radio" name="payment" value="pod">
+                  <span class="payment-radio"></span>
+                  <span class="payment-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  </span>
+                  <div class="payment-info">
+                    <span class="name">Pay on delivery</span>
+                    <span class="desc">Cash or transfer at your door — Lagos only</span>
+                  </div>
+                </label>
+              </div>
+            </section>
+          </div>
+
+          <!-- ORDER SUMMARY -->
+          <aside class="order-summary">
+            <h2>Order summary</h2>
+
+            <div class="order-items" id="orderItems"></div>
+
+            <div class="promo-row">
+              <label for="promoCode" class="sr-only">Promo code</label>
+              <input type="text" id="promoCode" placeholder="Promo code">
+              <button type="button" id="applyPromo">Apply</button>
+            </div>
+
+            <div class="order-totals">
+              <div class="order-total-row">
+                <span>Subtotal</span>
+                <span id="subtotal">₦0</span>
+              </div>
+              <div class="order-total-row">
+                <span>Delivery</span>
+                <span id="deliveryFee">₦2,500</span>
+              </div>
+              <div class="order-total-row discount" id="discountRow" style="display: none;">
+                <span>Discount</span>
+                <span id="discountAmount">-₦0</span>
+              </div>
+              <div class="order-total-row grand">
+                <span>Total</span>
+                <span id="grandTotal">₦0</span>
+              </div>
+            </div>
+
+            <div class="order-cta">
+              <button class="btn btn-accent btn-lg btn-block" id="placeOrderBtn">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>
+                Place order
+              </button>
+              <a href="shop.html" class="btn btn-outline btn-block">Continue shopping</a>
+            </div>
+
+            <div class="order-trust">
+              <div class="order-trust-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>
+                Free 7-day size exchange
+              </div>
+              <div class="order-trust-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                Encrypted & secure payment
+              </div>
+              <div class="order-trust-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                Delivery within 2–5 working days
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================
+         SUCCESS STATE
+         ============================================ -->
+    <div class="checkout-success" id="checkoutSuccess">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+      </div>
+      <h2>Order confirmed!</h2>
+      <p>Thank you for shopping with Rory Footwear. We've sent a confirmation email with your order details. Our team will reach out shortly to arrange delivery.</p>
+      <span class="success-order-id" id="orderIdDisplay">Order #RW-000000</span>
+      <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+        <a href="shop.html" class="btn btn-primary">Continue shopping</a>
+        <a href="index.html" class="btn btn-outline">Back to home</a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
