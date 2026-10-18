@@ -1,5 +1,5 @@
 /* =========================================================
-   Rory Footwear — page controllers
+   OAK Footwears — page controllers
    Each runs once app.js has booted (RF is the shared API).
    ========================================================= */
 window.RF_PAGES = window.RF_PAGES || {};
@@ -11,16 +11,31 @@ RF_PAGES.home = function (RF) {
     .sort((a, b) => b.tags.includes("bestseller") - a.tags.includes("bestseller") || b.stock - a.stock).slice(0, 4);
 
   RF.renderGrid($("#bestGrid"), best("all"));
-  RF.renderGrid($("#newGrid"), PRODUCTS.filter((p) => p.tags.includes("new")).slice(0, 4));
 
   $$("[data-tab]").forEach((btn) => btn.addEventListener("click", () => {
-    $$("[data-tab]").forEach((b) => { b.setAttribute("aria-pressed", "false"); b.className = "btn btn-sm btn-outline"; });
-    btn.setAttribute("aria-pressed", "true"); btn.className = "btn btn-sm btn-soft";
+    $$("[data-tab]").forEach((b) => b.setAttribute("aria-pressed", b === btn));
     RF.renderGrid($("#bestGrid"), best(btn.dataset.tab));
     $("#bestAll").href = btn.dataset.tab === "all" ? "shop.html" : "shop.html?g=" + btn.dataset.tab;
   }));
 
   const d = $("#heroDispatch"); if (d) d.innerHTML = RF.I.truck + " " + RF.dispatchMsg();
+
+  // New arrivals rail
+  const rail = $("#newGrid");
+  RF.renderGrid(rail, PRODUCTS.filter((p) => p.tags.includes("new")).concat(PRODUCTS.filter((p) => !p.tags.includes("new") && p.gender !== "kids")).slice(0, 8));
+  $$("[data-rail]").forEach((b) => b.addEventListener("click", () => rail.scrollBy({ left: +b.dataset.rail * rail.clientWidth * 0.75, behavior: "smooth" })));
+
+  // Spotlight (quick buy)
+  const sp = RF.byId("aurum-loafer"), box = $("#spotSizes");
+  if (sp && box) {
+    let size = null;
+    box.innerHTML = sp.sizes.map((s) => `<button aria-pressed="false" data-s="${s}" ${sp.soldOut.includes(s) ? "disabled" : ""}>${s}</button>`).join("");
+    box.addEventListener("click", (e) => { const b = e.target.closest("[data-s]"); if (!b || b.disabled) return; size = b.dataset.s; $$("[data-s]", box).forEach((x) => x.setAttribute("aria-pressed", x === b)); });
+    $("#spotAdd").addEventListener("click", () => {
+      if (!size) { RF.toast("Please select your size first"); box.animate([{ transform: "translateX(0)" }, { transform: "translateX(-6px)" }, { transform: "translateX(6px)" }, { transform: "translateX(0)" }], { duration: 300 }); return; }
+      RF.addAndOpen(sp.id, size);
+    });
+  }
 
   const form = $("#newsForm");
   form?.addEventListener("submit", (e) => {
@@ -28,7 +43,7 @@ RF_PAGES.home = function (RF) {
     const input = $("#newsEmail"), v = input.value.trim();
     if (!/^\S+@\S+\.\S+$/.test(v)) { input.style.borderColor = "#ff5c5c"; input.focus(); setTimeout(() => (input.style.borderColor = ""), 2000); return; }
     RF.store.set("subscriber", v);
-    form.innerHTML = `<div class="newsletter-input" style="flex:1;display:flex;align-items:center;gap:.5rem;background:#fff">${RF.I.check} You're in! Use code <b style="color:var(--coral)">WELCOME10</b> for 10% off.</div>`;
+    form.innerHTML = `<div style="flex:1;display:flex;align-items:center;gap:.6rem;padding:12px 18px;font-weight:500">${RF.I.check} You're in! Use code <b style="color:var(--oak)">WELCOME10</b> at checkout.</div>`;
   });
 };
 
@@ -57,8 +72,8 @@ RF_PAGES.shop = function (RF) {
     $("#filterDrawer .drawer-body").insertAdjacentHTML("beforeend", `<div class="filter-group"><h3>Size (EU)</h3><div class="filter-options">${Object.keys(sizeRanges).map((k) => `<label class="filter-option"><input type="checkbox" value="${k}" data-filter-mobile="size"><span>${k.replace("-", " – ")}${+k.split("-")[0] < 33 ? " (kids)" : ""}</span></label>`).join("")}</div></div>`);
   }
 
-  const titles = { men: "Men's <em>footwear</em>", women: "Women's <em>footwear</em>", kids: "Kids' <em>footwear</em>" };
-  const leads = { men: "Slides and sandals built for long days — EU 40 to 46.", women: "Slides, sandals and wedges for every plan — EU 36 to 42.", kids: "Easy straps, grippy soles, made for play — EU 24 to 32." };
+  const titles = { men: "Men", women: "Women", kids: "Kids" };
+  const leads = { men: "Loafers, slides and sandals built for long days. EU 40 – 46.", women: "Loafers, slides and sandals for every plan. EU 36 – 42.", kids: "Easy straps and grippy soles, made for play. EU 24 – 32." };
 
   function syncInputs() {
     ["category", "group", "size"].forEach((t) => {
@@ -90,11 +105,11 @@ RF_PAGES.shop = function (RF) {
 
     // Heading
     const g1 = state.group.length === 1 ? state.group[0] : "";
-    const title = state.wish ? "Your <em>wishlist</em>" : state.q ? `Results for <em>“${esc(state.q)}”</em>` : state.tag === "new" ? "New <em>in</em>" : state.tag === "sale" ? "On <em>sale</em>" : g1 ? titles[g1] : state.chip !== "all" ? `Shop <em>${RF.CATS[state.chip].toLowerCase()}</em>` : "Shop <em>all</em>";
+    const title = state.wish ? "Wishlist" : state.q ? `Results for “${esc(state.q)}”` : state.tag === "new" ? "New arrivals" : state.tag === "sale" ? "Sale" : g1 ? titles[g1] : state.chip !== "all" ? RF.CATS[state.chip] : "All footwear";
     $(".shop-hero h1").innerHTML = title;
     const crumb = $(".shop-hero .crumbs span:last-child"); if (crumb) crumb.textContent = title.replace(/<[^>]+>/g, "");
-    const lead = $(".shop-hero .lead"); if (lead) lead.textContent = state.wish ? "Styles you've saved. Tap the heart on any product to add it here." : g1 ? leads[g1] : "Slides, sandals and wedges for the whole family. Free 7-day size exchange.";
-    document.title = title.replace(/<[^>]+>/g, "").replace(/[“”]/g, "") + " — Rory Footwear";
+    const lead = $(".shop-hero .lead"); if (lead) lead.textContent = state.wish ? "Styles you've saved. Tap the heart on any product to add it here." : g1 ? leads[g1] : "Loafers, slides and sandals for men, women and kids. Free 7-day size exchange.";
+    document.title = title.replace(/<[^>]+>/g, "").replace(/[“”]/g, "") + " — OAK Footwears";
 
     $("#count").textContent = `${list.length} style${list.length !== 1 ? "s" : ""}`;
     const grid = $("#grid"), empty = $("#empty");
@@ -161,7 +176,7 @@ RF_PAGES.product = function (RF) {
   const badgeCls = off ? "hot" : p.tags.includes("new") ? "new" : "hot";
   const fit = p.gender === "kids" ? "Little feet grow fast — leave about 1cm of room." : "Fits true to size. Between sizes? Go up.";
 
-  document.title = `${p.name} — ${G[p.gender]}'s ${CATS[p.category]} | Rory Footwear`;
+  document.title = `${p.name} — ${G[p.gender]}'s ${CATS[p.category]} | OAK Footwears`;
   $('meta[name="description"]')?.setAttribute("content", p.blurb);
 
   $("#pdpRoot").innerHTML = `
@@ -262,7 +277,7 @@ RF_PAGES.product = function (RF) {
     $("#atcLabel").textContent = `Add to cart — ${money(p.price * sel.qty)}`;
     $("#sizeValue").textContent = sel.size ? "EU " + sel.size : "— select";
     $(".sticky-atc-meta").textContent = `${sel.color} · ${sel.size ? "EU " + sel.size : "Select size"}`;
-    $("#waBtn").href = waLink(`Hi Rory Footwear! I'd like to order:\n• ${p.name} (${sel.color})\n• Size: EU ${sel.size || "?"}\n• Qty: ${sel.qty}\n• Price: ${money(p.price * sel.qty)}\n${location.href}`);
+    $("#waBtn").href = waLink(`Hi OAK Footwears! I'd like to order:\n• ${p.name} (${sel.color})\n• Size: EU ${sel.size || "?"}\n• Qty: ${sel.qty}\n• Price: ${money(p.price * sel.qty)}\n${location.href}`);
   };
   const tryAdd = () => {
     if (!sel.size) {
@@ -418,7 +433,7 @@ RF_PAGES.checkout = function (RF) {
     s.querySelector("h2").textContent = `Thank you, ${o.customer.firstName}!`;
     s.querySelector("p").innerHTML = `We've received your order and will confirm it on WhatsApp (<b>${esc(o.customer.phone)}</b>) shortly. ${o.payment === "pod" ? "Please have cash or transfer ready on delivery." : ""}`;
     const lines = o.items.map((i) => `• ${i.name} (${i.color}, EU ${i.size}) × ${i.qty}`).join("\n");
-    const msg = `Hi Rory Footwear! I just placed order ${o.ref}.\n${lines}\nTotal: ${money(o.total)} (${o.status})\nDelivery: ${o.method} — ${o.customer.address}, ${o.customer.city}, ${o.customer.state}\nName: ${o.customer.firstName} ${o.customer.lastName}`;
+    const msg = `Hi OAK Footwears! I just placed order ${o.ref}.\n${lines}\nTotal: ${money(o.total)} (${o.status})\nDelivery: ${o.method} — ${o.customer.address}, ${o.customer.city}, ${o.customer.state}\nName: ${o.customer.firstName} ${o.customer.lastName}`;
     s.querySelector("div[style*='flex']").insertAdjacentHTML("beforebegin", `
       <div style="text-align:left;background:var(--surface);border:1px solid var(--rule);border-radius:var(--radius);padding:1.1rem 1.25rem;margin:0 auto 1.25rem;max-width:460px;font-size:.9rem">
         ${o.items.map((i) => `<div style="display:flex;justify-content:space-between;gap:1rem;padding:.25rem 0"><span>${esc(i.name)} · EU ${i.size} × ${i.qty}</span><b>${money(i.price * i.qty)}</b></div>`).join("")}

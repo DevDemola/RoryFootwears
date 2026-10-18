@@ -1,5 +1,5 @@
 /* =========================================================
-   Rory Footwear — shared storefront engine
+   OAK Footwears — shared storefront engine
    Cart, wishlist, search, size guide, nav, product cards.
    Loaded on every page AFTER data.js and pages.js.
    ========================================================= */
@@ -105,32 +105,35 @@
 
   /* ---------- Product card (matches .product-card design) ---------- */
   function badge(p) {
-    if (p.compareAt) return `<span class="product-tag hot">−${Math.round((1 - p.price / p.compareAt) * 100)}%</span>`;
-    if (p.tags.includes("new")) return `<span class="product-tag new">New</span>`;
-    if (p.tags.includes("bestseller")) return `<span class="product-tag">Bestseller</span>`;
+    if (p.compareAt) return `<span class="product-tag sale">−${Math.round((1 - p.price / p.compareAt) * 100)}%</span>`;
+    if (p.tags.includes("new")) return `<span class="product-tag">New</span>`;
+    if (p.tags.includes("bestseller")) return `<span class="product-tag dark">Bestseller</span>`;
     return "";
   }
   function card(p) {
-    const meta = `${G[p.gender]} · ${CATS[p.category]} · EU ${p.sizes[0]}–${p.sizes[p.sizes.length - 1]}`;
+    const meta = p.colors.length > 1 ? `${p.colors.length} colours` : p.colors[0].name;
     return `
     <article class="product-card" data-href="${url(p)}">
       <div class="product-media">
         <a href="${url(p)}" tabindex="-1" aria-hidden="true"><img src="${img(p)}" alt="${esc(p.name)}" loading="lazy" width="800" height="1000"></a>
         ${badge(p)}
         <button class="product-wish" data-wish="${p.id}" aria-pressed="${Wish.has(p.id)}" aria-label="Save ${esc(p.name)} to wishlist">${I.heart}</button>
+        <button class="product-quick" data-qa aria-label="Quick add ${esc(p.name)}">${I.plus}<span>Quick add</span></button>
         <div class="qa-pop" role="dialog" aria-label="Choose your size">
-          <div class="qa-head"><span>Select size (EU)</span><button class="qa-x" data-qa-close aria-label="Close">×</button></div>
+          <div class="qa-head"><span>Select size · EU</span><button class="qa-x" data-qa-close aria-label="Close">×</button></div>
           <div class="qa-sizes">${p.sizes.map((s) => `<button data-add="${p.id}" data-size="${s}" ${p.soldOut.includes(s) ? `disabled aria-label="${s} sold out"` : ""}>${s}</button>`).join("")}</div>
         </div>
       </div>
       <div class="product-info">
-        <a class="product-name" href="${url(p)}">${esc(p.name)}</a>
-        <span class="product-meta">${meta}</span>
-        ${p.colors.length > 1 ? `<span class="product-swatches">${p.colors.map((c) => `<i style="background:${c.hex}" title="${esc(c.name)}"></i>`).join("")}</span>` : ""}
-        <div class="product-bottom">
-          <span class="product-price">${money(p.price)}${p.compareAt ? ` <s>${money(p.compareAt)}</s>` : ""}</span>
-          <button class="product-add" data-qa aria-label="Quick add ${esc(p.name)}">${I.plus}</button>
+        <div class="product-row">
+          <a class="product-name" href="${url(p)}">${esc(p.name)}</a>
+          <span class="product-price">${money(p.price)}</span>
         </div>
+        <div class="product-row">
+          <span class="product-meta">${G[p.gender]} · ${CATS[p.category]} · ${esc(meta)}</span>
+          ${p.compareAt ? `<s class="product-compare">${money(p.compareAt)}</s>` : ""}
+        </div>
+        ${p.colors.length > 1 ? `<span class="product-swatches">${p.colors.map((c) => `<i style="background:${c.hex}" title="${esc(c.name)}"></i>`).join("")}</span>` : ""}
       </div>
     </article>`;
   }
@@ -156,8 +159,8 @@
     </aside>
     <div class="rf-search" id="searchPanel" role="dialog" aria-label="Search" aria-hidden="true">
       <div class="container">
-        <div class="rf-search-field">${I.search}<input id="searchInput" type="search" placeholder="Search slides, sandals, kids…" autocomplete="off" aria-label="Search products"><button class="rf-icon" data-close aria-label="Close search">${I.close}</button></div>
-        <div class="rf-search-tags">${["Slides", "Sandals", "Wedges", "Men", "Women", "Kids"].map((s) => `<button data-q="${s}">${s}</button>`).join("")}</div>
+        <div class="rf-search-field">${I.search}<input id="searchInput" type="search" placeholder="Search loafers, slides, sandals…" autocomplete="off" aria-label="Search products"><button class="rf-icon" data-close aria-label="Close search">${I.close}</button></div>
+        <div class="rf-search-tags">${["Loafers", "Slides", "Sandals", "Men", "Women", "Kids"].map((s) => `<button data-q="${s}">${s}</button>`).join("")}</div>
         <p class="rf-search-label" id="searchLabel">Popular right now</p>
         <div class="rf-search-results" id="searchResults"></div>
       </div>
@@ -168,11 +171,11 @@
         <p class="rf-muted">Stand on paper, mark your heel and longest toe, then measure in cm. Between sizes? Go up — exchanges are free within 7 days.</p>
         <table class="rf-table"><thead><tr><th>EU</th><th>UK</th><th>US</th><th>Foot (cm)</th></tr></thead><tbody>${sizeRows.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table>
         <p class="rf-muted" style="margin-top:12px"><b>Kids:</b> EU 24 ≈ 15cm · 26 ≈ 16.5cm · 28 ≈ 17.5cm · 30 ≈ 19cm · 32 ≈ 20cm</p>
-        <a class="btn btn-soft" style="margin-top:16px" target="_blank" rel="noopener" href="${waLink("Hi Rory Footwear, please help me pick my size.")}">${I.wa} Not sure? Ask us on WhatsApp</a>
+        <a class="btn btn-outline" style="margin-top:16px" target="_blank" rel="noopener" href="${waLink("Hi OAK Footwears, please help me pick my size.")}">${I.wa} Not sure? Ask us on WhatsApp</a>
       </div>
     </div>
     <div class="rf-toast" id="rfToast" role="status" aria-live="polite"></div>
-    ${document.body.dataset.page === "checkout" ? "" : `<a class="rf-wa-float" href="${waLink("Hi Rory Footwear! I'd like to make an enquiry.")}" target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp">${I.wa}<span>Chat with us</span></a>`}`;
+    ${document.body.dataset.page === "checkout" ? "" : `<a class="rf-wa-float" href="${waLink("Hi OAK Footwears! I'd like to make an enquiry.")}" target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp">${I.wa}<span>Chat with us</span></a>`}`;
     document.body.insertAdjacentHTML("beforeend", html);
   }
 
@@ -189,7 +192,7 @@
     $("#cartHeadCount").textContent = count ? `(${count})` : "";
     if (!count) {
       body.innerHTML = `<div class="rf-empty"><div class="rf-empty-ico">${I.bag}</div><h3>Your cart is empty</h3><p>Let's find you something comfy.</p>
-        <div class="rf-empty-links"><a class="btn btn-sm btn-soft" href="shop.html?g=men">Men</a><a class="btn btn-sm btn-soft" href="shop.html?g=women">Women</a><a class="btn btn-sm btn-soft" href="shop.html?g=kids">Kids</a></div></div>`;
+        <div class="rf-empty-links"><a class="btn btn-sm btn-outline" href="shop.html?g=men">Men</a><a class="btn btn-sm btn-outline" href="shop.html?g=women">Women</a><a class="btn btn-sm btn-outline" href="shop.html?c=loafers">Loafers</a></div></div>`;
       foot.hidden = true; return;
     }
     foot.hidden = false;
@@ -227,7 +230,7 @@
   }
   function orderText(extra) {
     const lines = Cart.items.map((i) => { const p = byId(i.id); return `• ${p.name} (${i.color}, EU ${i.size}) × ${i.qty} — ${money(p.price * i.qty)}`; }).join("\n");
-    return `Hi Rory Footwear! I'd like to order:\n${lines}\nSubtotal: ${money(Cart.subtotal() - Cart.discountAmount())}${extra ? "\n" + extra : ""}`;
+    return `Hi OAK Footwears! I'd like to order:\n${lines}\nSubtotal: ${money(Cart.subtotal() - Cart.discountAmount())}${extra ? "\n" + extra : ""}`;
   }
 
   /* ---------- Open / close ---------- */
@@ -258,7 +261,7 @@
     if (!q.trim()) { label.textContent = "Popular right now"; res.innerHTML = PRODUCTS.filter((p) => p.tags.includes("bestseller")).slice(0, 6).map(hit).join(""); return; }
     const hits = matches(q);
     label.innerHTML = hits.length ? `${hits.length} result${hits.length > 1 ? "s" : ""} · <a href="shop.html?q=${encodeURIComponent(q.trim())}">See all in shop →</a>` : "";
-    res.innerHTML = hits.length ? hits.map(hit).join("") : `<p class="rf-muted">No matches for “${esc(q)}”. Try “slides” or “kids” — or <a href="${waLink(`Hi Rory Footwear, do you have: ${q}?`)}" target="_blank" rel="noopener">ask us on WhatsApp</a>.</p>`;
+    res.innerHTML = hits.length ? hits.map(hit).join("") : `<p class="rf-muted">No matches for “${esc(q)}”. Try “loafers” or “slides” — or <a href="${waLink(`Hi OAK Footwears, do you have: ${q}?`)}" target="_blank" rel="noopener">ask us on WhatsApp</a>.</p>`;
   }
 
   /* ---------- Events ---------- */
@@ -322,8 +325,21 @@
     renderGrid(el, list) { if (!el) return; el.innerHTML = list.map(card).join(""); Wish.sync(); }
   };
 
+  function wireConfig() {
+    $$("[data-wa]").forEach((a) => (a.href = waLink(a.dataset.wa || "Hi " + CFG.brand + "!")));
+    $$("[data-ig]").forEach((a) => (a.href = "https://instagram.com/" + CFG.instagram));
+    $$("[data-tt]").forEach((a) => (a.href = "https://www.tiktok.com/@" + CFG.tiktok));
+    $$("[data-mail]").forEach((a) => { if (CFG.email) a.href = "mailto:" + CFG.email; else a.closest("li, p")?.remove(); });
+    $$("[data-cfg]").forEach((el) => (el.textContent = CFG[el.dataset.cfg] || ""));
+  }
+  function reveal() {
+    const els = $$(".reveal:not(.in)");
+    if (!("IntersectionObserver" in window)) return els.forEach((e) => e.classList.add("in"));
+    const io = new IntersectionObserver((es) => es.forEach((en) => { if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); } }), { rootMargin: "0px 0px -6% 0px" });
+    els.forEach((e) => io.observe(e));
+  }
   function boot() {
-    injectUI(); bind(); navActive(); renderCart(); Wish.sync();
+    wireConfig(); injectUI(); bind(); navActive(); renderCart(); Wish.sync(); reveal();
     const page = document.body.dataset.page;
     if (window.RF_PAGES && window.RF_PAGES[page]) window.RF_PAGES[page](RF);
   }
